@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFrameworks>net462</TargetFrameworks>
+		<LangVersion>8.0</LangVersion>
+		<UseWPF>true</UseWPF>
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Folder Include="AppData\" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Extended.Wpf.Toolkit" Version="4.2.0" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+		<PackageReference Include="TqkLibrary.Queues" Version="1.0.0-build2022021500" />
+		<PackageReference Include="TqkLibrary.SeleniumSupport" Version="1.0.0-build2022020800" />
+		<PackageReference Include="TqkLibrary.WpfUi" Version="1.0.0-build2022021900" />
+		<PackageReference Include="Nito.AsyncEx" Version="5.1.2" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Reference Include="System.Web" />
+	</ItemGroup>
+
+	<!--<ItemGroup>
+	  <ProjectReference Include="..\..\..\Library\TqkLibrary.SeleniumSupport\TqkLibrary.SeleniumSupport\TqkLibrary.SeleniumSupport.csproj" />
+	</ItemGroup>-->
+
+</Project>

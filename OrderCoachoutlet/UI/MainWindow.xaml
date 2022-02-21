@@ -1,0 +1,78 @@
+﻿<Window x:Class="OrderCoachoutlet.UI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OrderCoachoutlet.UI"
+        xmlns:ViewModels="clr-namespace:OrderCoachoutlet.UI.ViewModels"
+        xmlns:Xceed="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:WpfUiControl="clr-namespace:TqkLibrary.WpfUi.UserControls;assembly=TqkLibrary.WpfUi"
+        xmlns:WpfUiConveter="clr-namespace:TqkLibrary.WpfUi.Converters;assembly=TqkLibrary.WpfUi"
+        mc:Ignorable="d" Loaded="Window_Loaded"
+        Title="Order Coachoutlet" WindowStartupLocation="CenterScreen" Height="450" Width="800">
+    <Window.DataContext>
+        <ViewModels:MainWVM/>
+    </Window.DataContext>
+    <Window.Resources>
+        <WpfUiConveter:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="3*"/>
+            <RowDefinition Height="2*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="180"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid Grid.RowSpan="2">
+            <Button x:Name="btn_loadProxy" Click="btn_loadProxy_Click" IsEnabled="{Binding IsRunning,Converter={StaticResource InverseBooleanConverter}}" HorizontalAlignment="Right" Margin="0,10,10,0" VerticalAlignment="Top" Width="160">
+                <TextBlock>
+                    <Run Text="Load Proxy ( "/>
+                    <Run Text="{Binding DataManaged.ProxyCount,Mode=OneWay}"/>
+                    <Run Text=" )"/>
+                </TextBlock>
+            </Button>
+            <Button x:Name="btn_loadName" Click="btn_loadName_Click" IsEnabled="{Binding IsRunning,Converter={StaticResource InverseBooleanConverter}}" HorizontalAlignment="Center" Margin="0,35,0,0" VerticalAlignment="Top" Width="160">
+                <TextBlock>
+                    <Run Text="Load Name ( "/>
+                    <Run Text="{Binding DataManaged.NameCount,Mode=OneWay}"/>
+                    <Run Text=" )"/>
+                </TextBlock>
+            </Button>
+            <Button x:Name="btn_loadAddress" Click="btn_loadAddress_Click" IsEnabled="{Binding IsRunning,Converter={StaticResource InverseBooleanConverter}}" HorizontalAlignment="Center" Margin="0,60,0,0" VerticalAlignment="Top" Width="160">
+                <TextBlock>
+                    <Run Text="Load Address ( "/>
+                    <Run Text="{Binding DataManaged.AddressCount,Mode=OneWay}"/>
+                    <Run Text=" )"/>
+                </TextBlock>
+            </Button>
+            <Button x:Name="btn_loadCard" Click="btn_loadCard_Click" IsEnabled="{Binding IsRunning,Converter={StaticResource InverseBooleanConverter}}" HorizontalAlignment="Center" Margin="0,85,0,0" VerticalAlignment="Top" Width="160">
+                <TextBlock>
+                    <Run Text="Load Card ( "/>
+                    <Run Text="{Binding DataManaged.CardCount,Mode=OneWay}"/>
+                    <Run Text=" )"/>
+                </TextBlock>
+            </Button>
+
+            <TextBlock Text="Số luồng:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,143,0,0"/>
+            <Xceed:IntegerUpDown Value="{Binding ThreadCount}" IsEnabled="{Binding IsRunning,Converter={StaticResource InverseBooleanConverter}}" Minimum="1" Maximum="128" Increment="1" VerticalAlignment="Top" Margin="90,138,10,0" Height="24"/>
+
+            <Button x:Name="btn_start" Click="btn_start_Click" IsEnabled="{Binding IsRunning,Converter={StaticResource InverseBooleanConverter}}" Content="Start" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Margin="10,0,10,50"/>
+            <Button x:Name="btn_stop" Click="btn_stop_Click" IsEnabled="{Binding IsRunning}" Content="Stop" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Margin="10,0,10,5"/>
+        </Grid>
+        <ListView Grid.Column="1" Margin="5" Grid.Row="0" Grid.RowSpan="2" ItemsSource="{Binding Logs}">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Logs" Width="500">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}" TextWrapping="NoWrap"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+    </Grid>
+</Window>
