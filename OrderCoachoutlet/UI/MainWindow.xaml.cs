@@ -19,6 +19,7 @@ using TqkLibrary.Queues.TaskQueues;
 using OrderCoachoutlet.DataClass;
 using System.IO;
 using Microsoft.Win32;
+using System.Threading;
 
 namespace OrderCoachoutlet.UI
 {
@@ -31,6 +32,7 @@ namespace OrderCoachoutlet.UI
         readonly TaskQueue<WorkQueue> WorkQueues = new TaskQueue<WorkQueue>();
         public MainWindow()
         {
+            ThreadPool.SetMaxThreads(200, 200);
             InitializeComponent();
             this.mainWVM = this.DataContext as MainWVM;
             WorkQueues.OnRunComplete += WorkQueues_OnRunComplete;
@@ -82,7 +84,12 @@ namespace OrderCoachoutlet.UI
             if (!string.IsNullOrWhiteSpace(file))
                 mainWVM.DataManaged.LoadCard(file);
         }
-
+        private void btn_loadProduct_Click(object sender, RoutedEventArgs e)
+        {
+            string file = GetFile();
+            if (!string.IsNullOrWhiteSpace(file))
+                mainWVM.DataManaged.LoadProduct(file);
+        }
         string GetFile()
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -96,6 +103,12 @@ namespace OrderCoachoutlet.UI
         {
             try
             {
+                if(!mainWVM.DataManaged.IsAllowRunning)
+                {
+                    MessageBox.Show("Chưa đủ dữ kiện chạy", "Lỗi");
+                    return;
+                }
+
                 WorkQueues.ShutDown();
                 for (int i = 0; i < mainWVM.ThreadCount; i++)
                 {
@@ -121,5 +134,7 @@ namespace OrderCoachoutlet.UI
                 MessageBox.Show(ex.Message, ex.GetType().FullName);
             }
         }
+
+
     }
 }

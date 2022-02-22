@@ -56,6 +56,7 @@ namespace OrderCoachoutlet.Queues
                     if (cardData == null) return;
                     try
                     {
+                        WriteLog($"Start Card: {cardData.CardId}");
                         ChromeProfile chromeProfile = new ChromeProfile(cardData.CardId, logCallback);
 
                         OrderResult orderResult = null;
@@ -64,9 +65,12 @@ namespace OrderCoachoutlet.Queues
                             try
                             {
                                 string proxy = dataManaged.GetRandomProxy();
+                                WriteLog($"Card {cardData.CardId} : Open chrome ({proxy})");
                                 await chromeProfile.OpenChrome(proxy);
+
                                 orderResult = await chromeProfile.Order(
                                     cardData,
+                                    dataManaged.GetProducts(),
                                     dataManaged.GetRamdomNameData(),
                                     dataManaged.GetRamdomAddressData());
                                 break;
@@ -76,8 +80,9 @@ namespace OrderCoachoutlet.Queues
                                 WriteLog("Cancel");
                                 return;
                             }
-                            catch
+                            catch(Exception ex)
                             {
+                                WriteLog($"{ex.GetType().FullName}: {ex.Message} {ex.StackTrace}");
                                 continue;
                             }
                             finally
@@ -91,6 +96,7 @@ namespace OrderCoachoutlet.Queues
                             {
                                 using var stream = File.AppendText(Path.Combine(Singleton.ResultDir, $"{DateTime.Now:yyyy-MM-dd}.txt"));
                                 stream.WriteLine(orderResult);
+                                WriteLog($"Save {orderResult}");
                             }
                         }
                     }
@@ -101,7 +107,7 @@ namespace OrderCoachoutlet.Queues
                     }
                     catch (Exception ex)
                     {
-
+                        WriteLog($"{ex.GetType().FullName}: {ex.Message} {ex.StackTrace}");
                     }
                     finally
                     {
@@ -119,7 +125,7 @@ namespace OrderCoachoutlet.Queues
             }
             catch (Exception ex)
             {
-
+                WriteLog($"{ex.GetType().FullName}: {ex.Message} {ex.StackTrace}");
             }
         }
     }

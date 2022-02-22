@@ -51,39 +51,41 @@ namespace OrderCoachoutlet.Helpers
             base.OpenChrome(await InitChromeOption(proxy), null, cancellationToken);
         }
 
-        public async Task<OrderResult> Order(CardData cardData, NameData nameData, AddressData addressData)
+        public async Task<OrderResult> Order(CardData cardData, IEnumerable<string> products, NameData nameData, AddressData addressData)
         {
             if (!IsOpenChrome) throw new InvalidOperationException($"Chrome not open");
             ReadOnlyCollection<IWebElement> eles = null;
             IWebElement ele = null;
-            while (true)
+            bool isAddToCart = false;
+            foreach (var product in products.OrderBy(x => Guid.NewGuid()))
             {
-                chromeDriver.Navigate().GoToUrl("https://www.coachoutlet.com/");
+                chromeDriver.Manage().Cookies.DeleteAllCookies();
+                WriteLog($"Card {cardData.CardId} : Open product {product}");
+                chromeDriver.Navigate().GoToUrl(product);
                 WaitUntil(By.TagName("body"), ElementsExists);
-                chromeDriver.ExecuteScript("window.scrollTo(0,10000);");
-                eles = WaitUntil(By.CssSelector("a[href^='https://www.coachoutlet.com/shop/']"), ElementsExists);
-                ele = eles[rnd.Next(eles.Count)];
-                JsClick(ele);
-
-                WaitUntil(By.TagName("body"), ElementsExists);
-                eles = WaitUntil(By.CssSelector("div.product-tile a[href^='/products/']"), ElementsExists);
-                ele = eles[rnd.Next(eles.Count)];
-                JsClick(ele);
-
-                WaitUntil(By.TagName("body"), ElementsExists);
-                //eles = chromeDriver.FindElements(By.CssSelector("div.select-size button[data-qa='cm_link_size_swatch_enbld']"));
-                //if (eles.Count == 0)
-                //    continue;
-                //ele = eles[rnd.Next(eles.Count)];
-                //JsClick(ele);
-                await Task.Delay(1000, this.Token);
+                eles = chromeDriver.FindElements(By.CssSelector("div.select-size button[data-qa='cm_link_size_swatch_enbld']"));
+                if (eles.Count != 0)
+                {
+                    ele = eles[rnd.Next(eles.Count)];
+                    JsClick(ele); 
+                    await Task.Delay(4000, this.Token);
+                }
+                else
+                {
+                    eles = chromeDriver.FindElements(By.CssSelector("div.select-size button[data-qa='cm_link_size_swatch_dsbld']"));
+                    if (eles.Count > 0) continue;//all item disable
+                }
+                //default color auto select
                 ele = WaitUntil(By.CssSelector("button.add-to-cart"), ElementsExists).First();
                 if (!ele.Enabled)
                     continue;
+                WriteLog($"Card {cardData.CardId} : add cart product {product}");
                 JsClick(ele);
+                isAddToCart = true;
                 await Task.Delay(5000, this.Token);
                 break;
             }
+            if (!isAddToCart) return null;
 
             chromeDriver.Navigate().GoToUrl("https://www.coachoutlet.com/checkout-begin");
             WaitUntil(By.TagName("body"), ElementsExists);

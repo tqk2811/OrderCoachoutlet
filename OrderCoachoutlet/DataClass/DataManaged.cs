@@ -15,10 +15,16 @@ namespace OrderCoachoutlet.DataClass
         readonly AsyncLock _mutex = new AsyncLock();
         readonly Random _random = new Random();
 
+        public bool IsAllowRunning
+        {
+            get { return CardCount > 0 && AddressCount > 0 && NameCount > 0 && ProductCount > 0; }
+        }
         public int CardCount => CardDatas.Count;
         public int AddressCount => AddressDatas.Count;
         public int NameCount => NameDatas.Count;
         public int ProxyCount => Proxies.Count;
+        public int ProductCount => Products.Count;
+
 
         public event Action OnCountChange;
 
@@ -28,6 +34,7 @@ namespace OrderCoachoutlet.DataClass
         List<AddressData> AddressDatas { get; } = new List<AddressData>();
         List<NameData> NameDatas { get; } = new List<NameData>();
         List<string> Proxies { get; } = new List<string>();
+        List<string> Products { get; } = new List<string>();
 
         public void LoadCard(string filePath)
         {
@@ -80,7 +87,6 @@ namespace OrderCoachoutlet.DataClass
             }
             OnCountChange?.Invoke();
         }
-
         public void LoadName(string filePath)
         {
             try
@@ -102,7 +108,6 @@ namespace OrderCoachoutlet.DataClass
             }
             OnCountChange?.Invoke();
         }
-
         public void LoadProxy(string filePath)
         {
             try
@@ -119,7 +124,21 @@ namespace OrderCoachoutlet.DataClass
             OnCountChange?.Invoke();
         }
 
+        public void LoadProduct(string filePath)
+        {
+            try
+            {
+                Products.Clear();
+                Products.AddRange(File.ReadAllLines(filePath)
+                    .Where(x => !string.IsNullOrWhiteSpace(x))
+                    .Select(x => x.Trim()));
+            }
+            catch
+            {
 
+            }
+            OnCountChange?.Invoke();
+        }
 
 
 
@@ -158,6 +177,11 @@ namespace OrderCoachoutlet.DataClass
         {
             if (Proxies.Count == 0) return string.Empty;
             return Proxies[_random.Next(Proxies.Count)];
+        }
+
+        public IEnumerable<string> GetProducts()
+        {
+            return Products;
         }
     }
 }
