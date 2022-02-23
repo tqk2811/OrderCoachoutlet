@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using TqkLibrary.Queues.TaskQueues;
 
@@ -14,6 +15,7 @@ namespace OrderCoachoutlet.Queues
 {
     internal class WorkQueue : IQueue
     {
+        readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
         static readonly AsyncLock _mutex = new AsyncLock();
         readonly DataManaged dataManaged;
         readonly Action<string> logCallback;
@@ -32,12 +34,12 @@ namespace OrderCoachoutlet.Queues
 
         public void Cancel()
         {
-
+            cancellationTokenSource.Cancel();
         }
 
         public void Dispose()
         {
-
+            cancellationTokenSource.Dispose();
         }
         #endregion
 
@@ -66,7 +68,7 @@ namespace OrderCoachoutlet.Queues
                             {
                                 string proxy = dataManaged.GetRandomProxy();
                                 WriteLog($"Card {cardData.CardId} : Open chrome ({proxy})");
-                                await chromeProfile.OpenChrome(proxy);
+                                await chromeProfile.OpenChrome(proxy, cancellationTokenSource.Token);
 
                                 orderResult = await chromeProfile.Order(
                                     cardData,
@@ -80,7 +82,7 @@ namespace OrderCoachoutlet.Queues
                                 WriteLog("Cancel");
                                 return;
                             }
-                            catch(Exception ex)
+                            catch (Exception ex)
                             {
                                 WriteLog($"{ex.GetType().FullName}: {ex.Message} {ex.StackTrace}");
                                 continue;
