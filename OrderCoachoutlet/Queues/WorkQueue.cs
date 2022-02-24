@@ -113,9 +113,10 @@ namespace OrderCoachoutlet.Queues
                     }
                     finally
                     {
+                        string cardId = cardData.CardId;
                         _ = Task.Delay(5000).ContinueWith(t =>
                             {
-                                try { Directory.Delete(Path.Combine(Singleton.ProfileDir, cardData.CardId.ToString()), true); } catch { }
+                                try { Directory.Delete(Path.Combine(Singleton.ProfileDir, cardId), true); } catch { }
                             });
                     }
                 }
